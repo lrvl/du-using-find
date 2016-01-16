@@ -2,13 +2,11 @@
 import sys
 import re
 import pprint
-import json
+import operator
 from collections import defaultdict  # available in Python 2.5 and newer
 
-
 dict_dirs       = defaultdict(lambda: defaultdict(int))
-DEBUG		= 1
-
+DEBUG		= 0
 
 def pretty(d, indent=0):
    for key, value in d.iteritems():
@@ -37,12 +35,14 @@ for line in input:
 
 	for index,dirname in enumerate(line_array):
 		dirname_str = '/'.join(map(str,line_array[0:index]))
-		print dirname_str
+                if dirname_str == "":
+			continue
 		if dirname_str not in dict_dirs:
                         dict_dirs[dirname_str] = 0
-		#print "INDEX=%i DIRNAME=%s" % (index,dirname)
-		dict_dirs[dirname_str]+=bytesize
+		if bytesize < 512:				# At least account 512 bytes
+			dict_dirs[dirname_str]+=512
+		else:
+			dict_dirs[dirname_str]+=bytesize
 
-print '-'*80
-
-pretty(dict_dirs)
+for dirname in sorted(dict_dirs, key=dict_dirs.get, reverse=True):
+	print "%i\t%s" % (dict_dirs[dirname],dirname)
