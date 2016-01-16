@@ -2,7 +2,6 @@
 import sys
 import re
 import pprint
-import operator
 from collections import defaultdict  # available in Python 2.5 and newer
 
 dict_dirs       = defaultdict(lambda: defaultdict(int))
@@ -45,4 +44,17 @@ for line in input:
 			dict_dirs[dirname_str]+=bytesize
 
 for dirname in sorted(dict_dirs, key=dict_dirs.get, reverse=True):
-	print "%i\t%s" % (dict_dirs[dirname],dirname)
+	try:
+		print "%i\t%s" % (dict_dirs[dirname],dirname)
+		sys.stdout.flush()
+	except IOError:
+	    # stdout is closed, no point in continuing
+	    # Attempt to close them explicitly to prevent cleanup problems:
+		try:
+			sys.stdout.close()
+		except IOError:
+			pass
+		try:
+			sys.stderr.close()
+		except IOError:
+			pass
